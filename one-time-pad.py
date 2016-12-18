@@ -3,46 +3,24 @@ import random
 import sys
 
 
-def getByte(bits):
-  return int(bits, 2)
-
-
-def xor(x, y):
-  return bool(x) ^ bool(y)
-
-
-# Function definition is here
-def getBits(byte):
-  bits = '{0:08b}'.format(ord(byte))
-  return bits
-
-
 def encrypt(byte):
-  bits = getBits(byte)
-
-  key1 = []
-  key2 = []
-  for bit in bits:
-    aux = random.randint(0, 1)
-    key1.append(str(aux))
-    key2.append(str(int(xor(int(bit),aux))))
+  byte = ord(byte)
 
   keys = []
-  keys.append(chr(getByte("".join(key1))))
-  keys.append(chr(getByte("".join(key2))))
+  keys.append(random.randint(0, 255))
+  keys.append(byte ^ keys[0])
 
-  return keys;
+  return keys
 
 
-def decrypt(key1,key2):
-  key1Bits = getBits(key1)
-  key2Bits = getBits(key2)
+def decrypt(byte0,byte1):
+  keys = []
+  keys.append(ord(byte0))
+  keys.append(ord(byte1))
 
-  key = []
-  for i in range(0, 8):
-    key.append(str(int(xor(int(key1Bits[i]),int(key2Bits[i])))))
+  aux = keys[0] ^ keys[1]
 
-  return getByte("".join(key))
+  return aux
 
 
 def encryptFile(input1, output1, output2):
@@ -53,8 +31,8 @@ def encryptFile(input1, output1, output2):
     byte = f.read(1)
     while byte:
       aux = encrypt(byte)
-      key1File.write(ord(aux[0]).to_bytes(1,byteorder="big",signed=False))
-      key2File.write(ord(aux[1]).to_bytes(1,byteorder="big",signed=False))
+      key1File.write(aux[0].to_bytes(1,byteorder="big",signed=False))
+      key2File.write(aux[1].to_bytes(1,byteorder="big",signed=False))
       byte = f.read(1)
 
 
@@ -81,5 +59,3 @@ else:
   print("Argument parsing error.")
 
 print("Script finished.")
-
-
